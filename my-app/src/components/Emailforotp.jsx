@@ -11,8 +11,8 @@ function Emailforotp(){
     }
     const submitButton= async ()=>{
         let url = 'http://localhost:5000/users/emailsend';
-        console.log(inputField);
         let data = JSON.stringify(inputField)
+        var success =0;
         let options = {
             method :'POST',
             url : url,
@@ -23,9 +23,9 @@ function Emailforotp(){
         }
         try {
             let response = await axios(options)
-            console.log(response);
             if(response.data.statusText === "Success"){
                 toast.success(response.data.message);
+                success =1;
             }
             else {
                 toast.error(response.data.message);
@@ -34,6 +34,10 @@ function Emailforotp(){
         catch(e){
             toast.error("Something went wrong");
         }
+        if(success===1){
+            window.location.href = "/submitotp";
+        }
+        
      }
     return(
         <div className="container differentiate">

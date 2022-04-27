@@ -12,7 +12,6 @@ function Submitotp(){
     }
     const submitButton= async ()=>{
         let url = 'http://localhost:5000/users/getotp';
-        console.log(inputField);
         let data = JSON.stringify(inputField);
         let options = {
             method :'POST',

@@ -2,6 +2,7 @@ const Users =  require("../models/users");
 const Otp =  require("../models/otp");
 const nodemailer = require("nodemailer");
 const User = require("../models/users");
+var bcrypt = require('bcryptjs');
 const userList =async function(req,res){
    let data = await Users.find();
    res.json(data);
@@ -11,7 +12,6 @@ const emailSend = async function(req,res){
         req.body = JSON.parse(Object.keys(req.body)[0]);
     }
     const email = req.body.email;
-    console.log(req.body);
     const responseType = {};
     let data = await Users.findOne({email : email});
     if(data){
@@ -24,10 +24,7 @@ const emailSend = async function(req,res){
         let otpResponse = await otpData.save();
         responseType.statusText = "Success";
         responseType.message = "Please check Your Email";
-
-        console.log(generateOtp);
         const Response = await sendEmail(email,generateOtp);
-        console.log(Response);
     } 
     else {
         responseType.statusText = "error";
@@ -68,6 +65,7 @@ const userAdd = async function(req,res){
     }
     let response ={};
     let Res = {};
+    let myToken ;
     let {firstname,lastname,email,password} =req.body;
     if(req.body.email=='' || req.body.password==''){
         response.message = "Email or password can't be empty";
@@ -82,10 +80,11 @@ const userAdd = async function(req,res){
             password: password
         });
         Res = await data.save();
+        myToken = await data.getAuthToken();
         response.message = "You are registered successfully";
         response.status = "ok";
     }
-    res.status(200).json({response,Res});
+    res.status(200).json({response,Res,myToken});
 } 
 
 
@@ -93,7 +92,6 @@ const userLogin = async function(req,res){
     if(typeof req.body.email=="undefined"){
         req.body = JSON.parse(Object.keys(req.body)[0]);
     }
-    console.log(req.body);
     let message ={};
     var statusCode =0 ;
     if(!req.body.email || !req.body.password){
@@ -103,9 +101,10 @@ const userLogin = async function(req,res){
     }
     else {
         let user = await Users.findOne({email : req.body.email});
-   
         if(user){
-            if(req.body.password === user.password){
+            var match = await bcrypt.compare(req.body.password,user.password);
+            if(match){
+                let myToken = await user.getAuthToken();
                 message.statusCode = 100;
                 message.text = "Login Successfully";
             }
@@ -127,12 +126,11 @@ const userLogin = async function(req,res){
 const transporter = nodemailer.createTransport({
     service : "hotmail",
     auth :{
-        user:"user@outlook.com",
-        pass: "user@2000"
+        user:"krishnakumar10102000@outlook.com",
+        pass: "Krishna@2000"
     }
 });
 async function sendEmail(email,code) {
-    console.log(email);
     let message =  'Here is the OTP to verify your email id  '+ code;
   let info = await transporter.sendMail({
     from: 'krishnakumar10102000@outlook.com', 

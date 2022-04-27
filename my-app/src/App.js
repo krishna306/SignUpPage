@@ -3,22 +3,19 @@ import './App.css';
 import Login from "./components/Login";
 import Registration from './components/Registration';
 import Emailforotp from './components/Emailforotp';
-
+import Nav from './widgets/Nav'
 import Submitotp from './components/Submitotp';
-// import { Routes,Route} from 'react-router-dom';
+import { Routes,Route,Link} from 'react-router-dom';
 function App() {
   return (
     <div className='App'>
-      <Registration />
-      <Emailforotp />
-      <Submitotp />
-      <Login/>
-        {/* <Routes>
-          <Route path='/home' element={<Home />} />
-          <Route path='/' element={<Home />} />
+        <Nav/>
+        <Routes>
+          <Route path='/submitotp' element={<Submitotp />} />
+          <Route path='/emailsend' element={<Emailforotp />} />
           <Route path='/login' element={<Login />} />
           <Route path='/registration' element={<Registration />} />
-        </Routes> */}
+        </Routes>
   </div>
   );
 }
